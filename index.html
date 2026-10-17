@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pretty Killer Countdown</title>
+<meta name="description" content="Countdown to the Pretty Killer shop opening.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Bodoni+Moda:ital,wght@0,700;0,900;1,700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --pink:#f25fc4; --hot:#ff3fae; --blush:#fde9f0; --ink:#0b0a0c; --paper:#f2ecf0;
+  --mono:'IBM Plex Mono',ui-monospace,monospace; --display:'Bodoni Moda',Georgia,serif; --loud:'Anton',Impact,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{
+  min-height:100vh;min-height:100dvh;display:grid;place-items:center;padding:32px 16px;overflow-x:hidden;
+  color:var(--paper);font-family:var(--mono);
+  background:linear-gradient(115deg,var(--blush) 0 50%,var(--ink) 50% 100%);
+}
+.card{position:relative;width:min(760px,100%);background:var(--ink);border:2px solid var(--hot);padding:clamp(24px,5vw,48px);text-align:center;box-shadow:14px 14px 0 var(--pink)}
+.eyebrow{font:600 12px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--pink)}
+h1{margin:14px 0 6px;line-height:.95;font-size:clamp(44px,11vw,96px)}
+h1 .p{font-family:var(--display);font-weight:900;font-style:italic;color:var(--pink);display:block}
+h1 .k{font-family:var(--loud);font-weight:400;text-transform:uppercase;letter-spacing:.04em;color:var(--paper);display:block}
+.sub{margin:18px 0 26px;font-size:15px;color:#b9aeb6}
+.clock{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(8px,2vw,16px)}
+.unit{background:#17141a;border:1px solid #2c272f;padding:clamp(12px,3vw,20px) 4px}
+.unit b{display:block;font:400 clamp(36px,9vw,72px)/1 var(--loud);color:var(--hot);font-variant-numeric:tabular-nums}
+.unit span{display:block;margin-top:8px;font:600 11px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:#8c8390}
+.lock{margin-top:28px;display:inline-flex;align-items:center;gap:10px;padding:14px 22px;border:1.5px dashed #4a414f;color:#8c8390;font:600 13px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase}
+.lock svg{width:18px;height:18px}
+.go{margin-top:28px;display:inline-block;padding:18px 34px;background:var(--hot);color:var(--ink);text-decoration:none;font:400 clamp(22px,5vw,30px)/1 var(--loud);letter-spacing:.06em;text-transform:uppercase;box-shadow:6px 6px 0 var(--paper);transition:transform .15s}
+.go:hover,.go:focus-visible{transform:translate(-2px,-2px)}
+.go:focus-visible{outline:3px solid var(--paper);outline-offset:4px}
+.open .clock{opacity:.35}
+@media (prefers-reduced-motion:no-preference){ .open .go{animation:pop .5s ease-out} @keyframes pop{from{transform:scale(.8);opacity:0}} }
+</style>
+</head>
+<body>
+<main class="card" id="card">
+  <div class="eyebrow">Finn Shapiro · Pretty Killer Tour</div>
+  <h1><span class="p">Pretty</span><span class="k">Killer</span></h1>
+  <p class="sub" id="sub">The shop opens soon.</p>
+  <div class="clock" role="timer" aria-live="off">
+    <div class="unit"><b id="d">00</b><span>Days</span></div>
+    <div class="unit"><b id="h">00</b><span>Hours</span></div>
+    <div class="unit"><b id="m">00</b><span>Minutes</span></div>
+    <div class="unit"><b id="s">00</b><span>Seconds</span></div>
+  </div>
+  <div id="action">
+    <div class="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="1"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Locked until the countdown ends</div>
+  </div>
+</main>
+<script>
+// The countdown ends at noon Eastern Time on Sunday, October 18, 2026 (EDT is UTC-4).
+const OPENS_AT = new Date("2026-10-18T12:00:00-04:00").getTime();
+const SHOP_URL = "https://qwerty-ally.github.io/pretty-killer-shop/";
+
+const $ = id => document.getElementById(id);
+const pad = n => String(n).padStart(2, "0");
+const when = new Date(OPENS_AT).toLocaleString([], { weekday:"long", month:"long", day:"numeric", hour:"numeric", minute:"2-digit", timeZoneName:"short" });
+$("sub").textContent = `The shop opens ${when}.`;
+
+let unlocked = false, timer;
+function tick(){
+  const left = Math.max(0, OPENS_AT - Date.now()), t = Math.floor(left / 1000);
+  $("d").textContent = pad(Math.floor(t / 86400));
+  $("h").textContent = pad(Math.floor(t / 3600) % 24);
+  $("m").textContent = pad(Math.floor(t / 60) % 60);
+  $("s").textContent = pad(t % 60);
+  if (left === 0 && !unlocked) unlock();
+}
+function unlock(){
+  unlocked = true; clearInterval(timer);
+  $("card").classList.add("open");
+  $("sub").textContent = "The shop is open!";
+  $("action").innerHTML = `<a class="go" href="${SHOP_URL}">Enter the shop ▶</a>`;
+  document.title = "Pretty Killer · Shop open";
+}
+tick();
+if (!unlocked) timer = setInterval(tick, 250);
+</script>
+</body>
+</html>
