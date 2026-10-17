@@ -20,14 +20,22 @@ body{
   color:var(--paper);font-family:var(--mono);
   background:linear-gradient(115deg,var(--blush) 0 50%,var(--ink) 50% 100%);
 }
-.card{position:relative;width:min(760px,100%);background:var(--ink);border:2px solid var(--hot);padding:clamp(24px,5vw,48px);text-align:center;box-shadow:14px 14px 0 var(--pink)}
+/* the card is a receipt: dashed rules, a torn zigzag bottom edge, a barcode at the end */
+.card{position:relative;width:min(760px,100%);background:var(--ink);border:2px solid var(--hot);border-bottom:0;padding:clamp(24px,5vw,48px) clamp(24px,5vw,48px) clamp(28px,5vw,44px);text-align:center;filter:drop-shadow(14px 14px 0 var(--pink))}
+.card::after{content:"";position:absolute;left:-2px;right:-2px;top:100%;height:14px;background:linear-gradient(135deg,var(--ink) 50%,transparent 50%) 0 0/14px 14px repeat-x,linear-gradient(225deg,var(--ink) 50%,transparent 50%) 0 0/14px 14px repeat-x}
 .eyebrow{font:600 12px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--pink)}
+.meta{display:flex;justify-content:space-between;gap:12px;margin:0 0 18px;padding-bottom:12px;border-bottom:1.5px dashed #3a333f;font:500 11px/1.4 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:#8c8390}
+.rule{border:0;border-top:1.5px dashed #3a333f;margin:26px 0 18px}
+.barcode{display:block;margin:0 auto;width:min(260px,80%);height:44px}
+.code{margin-top:6px;font:500 11px/1 var(--mono);letter-spacing:.3em;color:#8c8390}
 h1{margin:14px 0 6px;line-height:.95;font-size:clamp(44px,11vw,96px)}
 h1 .p{font-family:var(--display);font-weight:900;font-style:italic;color:var(--pink);display:block}
 h1 .k{font-family:var(--loud);font-weight:400;text-transform:uppercase;letter-spacing:.04em;color:var(--paper);display:block}
 .sub{margin:18px 0 26px;font-size:15px;color:#b9aeb6}
 .clock{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(8px,2vw,16px)}
-.unit{background:#17141a;border:1px solid #2c272f;padding:clamp(12px,3vw,20px) 4px}
+/* each number sits on a little hang tag: clipped top corners and a punched hole */
+.unit{position:relative;background:#17141a;border-top:3px solid var(--hot);padding:clamp(20px,4vw,28px) 4px clamp(12px,3vw,18px);clip-path:polygon(14px 0,calc(100% - 14px) 0,100% 14px,100% 100%,0 100%,0 14px)}
+.unit::before{content:"";position:absolute;top:9px;left:50%;width:7px;height:7px;margin-left:-3.5px;border-radius:50%;background:var(--ink);box-shadow:0 0 0 1.5px #3a333f}
 .unit b{display:block;font:400 clamp(36px,9vw,72px)/1 var(--loud);color:var(--hot);font-variant-numeric:tabular-nums}
 .unit span{display:block;margin-top:8px;font:600 11px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:#8c8390}
 .lock{margin-top:28px;display:inline-flex;align-items:center;gap:10px;padding:14px 22px;border:1.5px dashed #4a414f;color:#8c8390;font:600 13px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase}
@@ -41,6 +49,7 @@ h1 .k{font-family:var(--loud);font-weight:400;text-transform:uppercase;letter-sp
 </head>
 <body>
 <main class="card" id="card">
+  <div class="meta"><span>Nº 001</span><span id="metaDate">Oct 18 · 12:00</span></div>
   <div class="eyebrow">Finn Shapiro · Pretty Killer Tour</div>
   <h1><span class="p">Pretty</span><span class="k">Killer</span></h1>
   <p class="sub" id="sub">The shop opens soon.</p>
@@ -53,6 +62,9 @@ h1 .k{font-family:var(--loud);font-weight:400;text-transform:uppercase;letter-sp
   <div id="action">
     <div class="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="1"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Locked until the countdown ends</div>
   </div>
+  <hr class="rule">
+  <svg class="barcode" id="barcode" viewBox="0 0 260 44" preserveAspectRatio="none" aria-hidden="true"></svg>
+  <div class="code">PK · 1018 · 1200</div>
 </main>
 <script>
 // The countdown ends at noon Eastern Time on Sunday, October 18, 2026 (EDT is UTC-4).
@@ -63,6 +75,19 @@ const $ = id => document.getElementById(id);
 const pad = n => String(n).padStart(2, "0");
 const when = new Date(OPENS_AT).toLocaleString([], { weekday:"long", month:"long", day:"numeric", hour:"numeric", minute:"2-digit", timeZoneName:"short" });
 $("sub").textContent = `The shop opens ${when}.`;
+$("metaDate").textContent = new Date(OPENS_AT).toLocaleString([], { month:"short", day:"numeric", hour:"numeric", minute:"2-digit" });
+
+// barcode: fixed bar pattern so it looks the same every visit
+(() => {
+  let x = 4, seed = 1018, bars = "";
+  const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+  while (x < 254){
+    const w = 1 + Math.floor(rnd() * 3.2);
+    bars += `<rect x="${x}" y="0" width="${w}" height="44" fill="#f2ecf0"/>`;
+    x += w + 1 + Math.floor(rnd() * 3);
+  }
+  $("barcode").innerHTML = bars;
+})();
 
 let unlocked = false, timer;
 function tick(){
