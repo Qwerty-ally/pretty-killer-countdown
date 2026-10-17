@@ -1,5 +1,5 @@
 ﻿# Pretty Killer Countdown
 
-A countdown to the Pretty Killer shop opening. It ends at **12:00 PM Eastern Time on Sunday, October 18, 2026**, then unlocks an **Enter the shop** button that links to https://qwerty-ally.github.io/pretty-killer-shop/.
+A countdown that ends at **12:00 PM Eastern Time on Sunday, October 18, 2026**, then unlocks an **Enter** button.
 
-To change the time or the link, edit `OPENS_AT` and `SHOP_URL` at the top of the script in `index.html`.
+To change the time, edit `OPENS_AT` at the top of the script in `index.html`. The button's link is `DOOR` (stored scrambled with base64 so it isn't readable at a glance).

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Pretty Killer Countdown</title>
-<meta name="description" content="Countdown to the Pretty Killer shop opening.">
+<meta name="description" content="Pretty Killer. Something is coming.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bodoni+Moda:ital,wght@0,700;0,900;1,700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
@@ -52,7 +52,7 @@ h1 .k{font-family:var(--loud);font-weight:400;text-transform:uppercase;letter-sp
   <div class="meta"><span>Nº 001</span><span id="metaDate">Oct 18 · 12:00</span></div>
   <div class="eyebrow">Finn Shapiro · Pretty Killer Tour</div>
   <h1><span class="p">Pretty</span><span class="k">Killer</span></h1>
-  <p class="sub" id="sub">The shop opens soon.</p>
+  <p class="sub" id="sub">Something is coming.</p>
   <div class="clock" role="timer" aria-live="off">
     <div class="unit"><b id="d">00</b><span>Days</span></div>
     <div class="unit"><b id="h">00</b><span>Hours</span></div>
@@ -67,14 +67,14 @@ h1 .k{font-family:var(--loud);font-weight:400;text-transform:uppercase;letter-sp
   <div class="code">PK · 1018 · 1200</div>
 </main>
 <script>
-// The countdown ends at noon Eastern Time on Sunday, October 18, 2026 (EDT is UTC-4).
+// The countdown ends at noon Eastern Time on Sunday, October 18, 2026 (EDT is UTC-4), then shows the Enter button.
 const OPENS_AT = new Date("2026-10-18T12:00:00-04:00").getTime();
-const SHOP_URL = "https://qwerty-ally.github.io/pretty-killer-shop/";
+const DOOR = atob("aHR0cHM6Ly9xd2VydHktYWxseS5naXRodWIuaW8vcHJldHR5LWtpbGxlci1zaG9wLw==");
 
 const $ = id => document.getElementById(id);
 const pad = n => String(n).padStart(2, "0");
 const when = new Date(OPENS_AT).toLocaleString([], { weekday:"long", month:"long", day:"numeric", hour:"numeric", minute:"2-digit", timeZoneName:"short" });
-$("sub").textContent = `The shop opens ${when}.`;
+$("sub").textContent = `Something is coming. ${when}.`;
 $("metaDate").textContent = new Date(OPENS_AT).toLocaleString([], { month:"short", day:"numeric", hour:"numeric", minute:"2-digit" });
 
 // barcode: fixed bar pattern so it looks the same every visit
@@ -101,9 +101,9 @@ function tick(){
 function unlock(){
   unlocked = true; clearInterval(timer);
   $("card").classList.add("open");
-  $("sub").textContent = "The shop is open!";
-  $("action").innerHTML = `<a class="go" href="${SHOP_URL}">Enter the shop ▶</a>`;
-  document.title = "Pretty Killer · Shop open";
+  $("sub").textContent = "It's here.";
+  $("action").innerHTML = `<a class="go" href="${DOOR}">Enter ▶</a>`;
+  document.title = "Pretty Killer · Open";
 }
 tick();
 if (!unlocked) timer = setInterval(tick, 250);
